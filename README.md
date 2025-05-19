@@ -1,1 +1,2 @@
-# PathWise-
+# PathWise
+🎯 PathWise – Personalized Roadmap Generator
