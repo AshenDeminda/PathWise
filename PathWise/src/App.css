@@ -359,11 +359,16 @@ footer {
   z-index: 1;
 }
 
+
 /* Responsive styles */
 @media (max-width: 1024px) {
   .main-content {
     padding: 0 1rem 1rem;
     gap: 1rem;
+  }
+
+  .left-panel, .right-panel {
+    height: calc(100vh - 160px);
   }
 }
 
@@ -371,19 +376,29 @@ footer {
   .main-content {
     flex-direction: column;
     padding: 0 1rem 1rem;
+    overflow-y: auto;  /* Keep one main scrollbar */
     height: auto;
-    overflow-y: auto;
   }
 
   .left-panel,
   .right-panel {
     width: 100%;
     min-width: 100%;
+    overflow-y: visible; /* Remove individual scrollbars */
     height: auto;
   }
 
   .left-panel {
-    margin-bottom: 1rem;
+    margin-bottom: 0; /* Remove margin to keep elements together */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+  
+  .right-panel {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 0;  /* Ensure it attaches to bottom of left panel */
   }
 
   .input-group textarea {
@@ -391,21 +406,29 @@ footer {
   }
 
   .output-content {
-    min-height: 300px;
-    max-height: 50vh;
+    min-height: 250px;
+    max-height: none;
+    overflow-y: visible; /* Remove inner scrollbar */
   }
 
-  header h1 {
+  .header h1 {
     font-size: 2rem;
   }
 
-  header p {
+  .header p {
     font-size: 0.9rem;
   }
   
   .logo-icon {
     width: 28px;
     height: 28px;
+  }
+  
+  /* Make app container scrollable */
+  .app-container {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
   }
 }
 
@@ -457,4 +480,24 @@ footer {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #414a58;
+}
+
+/* Instructions for desktop and mobile */
+.desktop-instructions, .mobile-instructions {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.mobile-instructions {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-instructions {
+    display: none;
+  }
+  
+  .mobile-instructions {
+    display: block;
+  }
 }
