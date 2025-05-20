@@ -1,18 +1,48 @@
-import { useState } from "react";
-import { getLearningPath } from "./api/openai";
+import { useState, useEffect } from "react";
+import { getLearningPath } from "./api/geminiapi"; // Updated import
 import "./App.css";
 
 function App() {
   const [form, setForm] = useState({ skills: "", goals: "", interests: "" });
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [apiKeyValid, setApiKeyValid] = useState(true);
+
+  // Check if API key exists on component mount
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey || apiKey.trim() === "") {
+      setApiKeyValid(false);
+      setError("Gemini API key is missing or invalid. Please add a valid key to your .env file.");
+    } else {
+      setApiKeyValid(true);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
+    // Reset states
     setLoading(true);
+    setError("");
+    
+    // Validate inputs
+    if (!form.skills.trim() || !form.goals.trim() || !form.interests.trim()) {
+      setError("Please fill in all fields before generating your roadmap.");
+      setLoading(false);
+      return;
+    }
+
+    // Check if API key is valid
+    if (!apiKeyValid) {
+      setError("Gemini API key is missing or invalid. Please add a valid key to your .env file.");
+      setLoading(false);
+      return;
+    }
+    
     const prompt = `
 I'm a learner with these skills: ${form.skills}.
 My goals: ${form.goals}.
@@ -24,9 +54,13 @@ Please create a detailed 8-week personalized learning roadmap with topics and re
       const result = await getLearningPath(prompt);
       setOutput(result);
     } catch (err) {
-      setOutput("Something went wrong. Please try again.");
+      console.error("Error generating roadmap:", err);
+      // Display the specific error message from the API
+      setError(err.message || "Failed to generate your roadmap. Please try again later.");
+      setOutput("");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -51,6 +85,8 @@ Please create a detailed 8-week personalized learning roadmap with topics and re
       <div className="main-content">
         <div className="left-panel">
           <h2>Create Your Learning Roadmap</h2>
+          
+          {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">
             <label htmlFor="skills">Current Skills</label>
